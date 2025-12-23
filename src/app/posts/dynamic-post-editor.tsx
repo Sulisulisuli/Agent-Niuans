@@ -96,9 +96,10 @@ interface DynamicPostEditorProps {
     collectionId: string
     token: string
     initialData?: any // Optional initial data for editing
+    onSuccess?: () => void
 }
 
-export default function DynamicPostEditor({ fields, collectionId, token, initialData }: DynamicPostEditorProps) {
+export default function DynamicPostEditor({ fields, collectionId, token, initialData, ...props }: DynamicPostEditorProps) {
     // State to hold form values dynamic to the schema
     // Initialize with initialData if present (fieldData is usually nested in item response, but let's assume raw field map is passed)
     // If passing full item object, we might need to access item.fieldData
@@ -207,7 +208,13 @@ export default function DynamicPostEditor({ fields, collectionId, token, initial
             await cleanupStagedImages()
 
             setStatus('success')
-            setTimeout(() => setStatus('idle'), 3000)
+            // Delay for success animation before redirecting
+            setTimeout(() => {
+                setStatus('idle')
+                if (props.onSuccess) {
+                    props.onSuccess()
+                }
+            }, 1000)
         }
     }
 

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import DynamicPostEditor from './dynamic-post-editor'
 import PostList from './post-list'
+import { useRouter } from 'next/navigation'
 
 interface ClientPageContentProps {
     fields: any[]
@@ -14,6 +15,7 @@ interface ClientPageContentProps {
 export default function ClientPageContent({ fields, collectionId, token, initialItems }: ClientPageContentProps) {
     const [view, setView] = useState<'list' | 'create' | 'edit'>('list')
     const [editingItem, setEditingItem] = useState<any>(null)
+    const router = useRouter()
 
     const handleCreateNew = () => {
         setEditingItem(null)
@@ -27,6 +29,12 @@ export default function ClientPageContent({ fields, collectionId, token, initial
     }
 
     const handleBack = () => {
+        setView('list')
+        setEditingItem(null)
+    }
+
+    const handleSuccess = () => {
+        router.refresh()
         setView('list')
         setEditingItem(null)
     }
@@ -58,6 +66,7 @@ export default function ClientPageContent({ fields, collectionId, token, initial
                 collectionId={collectionId}
                 token={token}
                 initialData={editingItem}
+                onSuccess={handleSuccess}
             />
         </div>
     )

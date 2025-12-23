@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { WebflowItem } from '@/lib/webflow' // You might need to export this interface from lib/webflow
@@ -39,6 +39,11 @@ export default function PostList({ initialItems, collectionId, token, onCreateNe
     const [updatingId, setUpdatingId] = useState<string | null>(null)
     const [error, setError] = useState<string | null>(null)
     const [isDeleting, setIsDeleting] = useState(false)
+
+    // Sync items when initialItems prop updates (e.g. after router.refresh())
+    useEffect(() => {
+        setItems(initialItems)
+    }, [initialItems])
 
     const getItemStatus = (item: any) => {
         if (item.isDraft) return 'DRAFT'
@@ -185,14 +190,14 @@ export default function PostList({ initialItems, collectionId, token, onCreateNe
                                     >
                                         <SelectTrigger
                                             className={`w-auto h-7 px-3 text-xs font-medium rounded-none border-0 transition-colors ${getItemStatus(item) === 'DRAFT' ? 'bg-gray-100 text-gray-600 hover:bg-gray-200' :
-                                                    getItemStatus(item) === 'STAGED' ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200' :
-                                                        'bg-green-100 text-green-700 hover:bg-green-200'
+                                                getItemStatus(item) === 'STAGED' ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200' :
+                                                    'bg-green-100 text-green-700 hover:bg-green-200'
                                                 }`}
                                         >
                                             <div className="flex items-center gap-1.5 mr-1">
                                                 <div className={`w-1.5 h-1.5 rounded-full ${getItemStatus(item) === 'DRAFT' ? 'bg-gray-400' :
-                                                        getItemStatus(item) === 'STAGED' ? 'bg-yellow-500' :
-                                                            'bg-green-500'
+                                                    getItemStatus(item) === 'STAGED' ? 'bg-yellow-500' :
+                                                        'bg-green-500'
                                                     }`} />
                                                 <SelectValue />
                                             </div>
