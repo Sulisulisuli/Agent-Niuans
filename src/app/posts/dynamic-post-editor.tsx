@@ -12,6 +12,9 @@ import { generatePostContent } from './ai-actions'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
 import { UploadCloud, X } from 'lucide-react'
+import { RichTextEditor } from '@/components/ui/rich-text-editor'
+import { Switch } from "@/components/ui/switch"
+import { shareOnLinkedIn } from './linkedin-server-actions'
 
 function ImageUploader({ value, onChange }: { value: string, onChange: (url: string) => void }) {
     const [uploading, setUploading] = useState(false)
@@ -106,6 +109,7 @@ export default function DynamicPostEditor({ fields, collectionId, token, initial
     const [formData, setFormData] = useState<Record<string, any>>(initialData?.fieldData || {})
     const [status, setStatus] = useState<'idle' | 'generating' | 'saving' | 'success' | 'error'>('idle')
     const [errorMessage, setErrorMessage] = useState('')
+    const [postToLinkedin, setPostToLinkedin] = useState(false)
 
     // AI State
     const [aiLoading, setAiLoading] = useState(false)
@@ -208,6 +212,45 @@ export default function DynamicPostEditor({ fields, collectionId, token, initial
             await cleanupStagedImages()
 
             setStatus('success')
+
+            // Handle LinkedIn Posting
+            if (postToLinkedin) {
+                // Determine content: Try to find a 'post-body', 'content', or 'summary' field
+                // Fallback to the first RichText or PlainText field
+                let contentToShare = ''
+
+                // Extremely basic heuristic to find content
+                const contentField = fields.find(f => ['post-body', 'content', 'summary', 'description'].includes(f.slug))
+                    || fields.find(f => f.type === 'RichText')
+                    || fields.find(f => f.type === 'PlainText')
+
+                if (contentField) {
+                    // Strip HTML if it's rich text (very basic stripping)
+                    const rawContent = formData[contentField.slug] || ''
+                    contentToShare = rawContent.replace(/<[^>]*>?/gm, '') // Simple strip tags
+                }
+
+                // If prompt exists and content is empty, maybe use prompt? No, that's unsafe.
+
+                if (contentToShare) {
+                    // Try to find an image
+                    const imageField = fields.find(f => f.type === 'Image')
+                    const imageUrl = imageField ? formData[imageField.slug] : undefined
+
+                    try {
+                        const linkedinRes = await shareOnLinkedIn(contentToShare, undefined, 'PUBLIC') // TODO: Add article URL support later
+                        if (!linkedinRes.success) {
+                            console.error('LinkedIn Share Failed:', linkedinRes.error)
+                            alert(`Webflow post saved, but LinkedIn share failed: ${linkedinRes.error}`)
+                        } else {
+                            console.log('LinkedIn Share Success:', linkedinRes.postId)
+                        }
+                    } catch (err) {
+                        console.error('LinkedIn Share Exception:', err)
+                    }
+                }
+            }
+
             // Delay for success animation before redirecting
             setTimeout(() => {
                 setStatus('idle')
@@ -313,7 +356,20 @@ export default function DynamicPostEditor({ fields, collectionId, token, initial
             {/* Header / Actions */}
             <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold tracking-tight">{initialData ? 'Edit Post' : 'New Post'}</h2>
-                <div className="flex gap-2">
+                <div className="flex gap-4 items-center">
+                    <div className="flex items-center space-x-2">
+                        <Switch
+                            id="linkedin-mode"
+                            checked={postToLinkedin}
+                            onCheckedChange={setPostToLinkedin}
+                            className="data-[state=checked]:bg-[#0077b5]"
+                        />
+                        <Label htmlFor="linkedin-mode" className="flex items-center gap-2 cursor-pointer">
+                            <span className="text-sm font-medium">Post to LinkedIn</span>
+                            {postToLinkedin && <span className="text-[10px] bg-[#0077b5] text-white px-1.5 py-0.5 rounded-full">BETA</span>}
+                        </Label>
+                    </div>
+
                     <Button
                         onClick={handleSave}
                         disabled={status !== 'idle' && status !== 'success'}
@@ -350,11 +406,9 @@ export default function DynamicPostEditor({ fields, collectionId, token, initial
                             )}
 
                             {field.type === 'RichText' && (
-                                <Textarea
-                                    className="rounded-none border-black min-h-[200px] text-base font-serif"
-                                    placeholder="Write your story here..."
+                                <RichTextEditor
                                     value={formData[field.slug] || ''}
-                                    onChange={(e) => handleChange(field.slug, e.target.value)}
+                                    onChange={(html) => handleChange(field.slug, html)}
                                 />
                             )}
 

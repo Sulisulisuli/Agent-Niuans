@@ -30,7 +30,7 @@ export default async function OrganizationSettingsPage() {
                 <header className="h-16 border-b border-gray-200 flex items-center px-8 flex-shrink-0 gap-8">
                     <h1 className="text-xl font-bold tracking-tight">Organization Settings</h1>
                     <nav className="flex gap-4">
-                        <a href="/settings" className="text-sm font-medium text-gray-400 hover:text-black transition-colors pb-5 mt-5 border-b-2 border-transparent hover:border-gray-200">Webflow API</a>
+                        <a href="/settings" className="text-sm font-medium text-gray-400 hover:text-black transition-colors pb-5 mt-5 border-b-2 border-transparent hover:border-gray-200">Integrations</a>
                         <a href="/settings/organization" className="text-sm font-medium border-b-2 border-black pb-5 mt-5">Brand & General</a>
                     </nav>
                 </header>

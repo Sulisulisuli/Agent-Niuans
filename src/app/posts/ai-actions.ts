@@ -104,7 +104,8 @@ export async function generatePostContent({ prompt, fields, context }: GenerateO
 
         // 4. Build the full prompt
         const fullPrompt = `
-        You are a professional content generator for a CMS.
+        You are an elite SEO & AEO (Answer Engine Optimization) Copywriter.
+        Your goal is to create content that ranks #1 on Google and is cited by AI assistants (Perplexity, Gemini, ChatGPT).
         
         ${brandInstruction}
 
@@ -120,15 +121,24 @@ export async function generatePostContent({ prompt, fields, context }: GenerateO
         ${schemaDescription}
         
         ADDITIONAL REQUIREMENTS:
-        - Also generate a list of 5-10 SEO keywords relevant to the content.
+        - First, identify 5-10 strong SEO keywords relevant to the topic.
+        - CRITICAL: Use these keywords naturally throughout the content (in titles, headings, and body text).
         - Return the result as a JSON object where keys match the schema slugs.
-        - INCLUDE a special key "_keywords" for the list of keywords.
+        - INCLUDE a special key "_keywords" for the list of these used keywords.
         
+        STRICT FORMATTING RULES (For RichText Fields):
+        1.  **Structure**: logic MUST be broken down with <h2> and <h3> tags. NEVER output a wall of text.
+        2.  **Lists**: You MUST include at least one unordered list (<ul>) or ordered list (<ol>) to break up content.
+        3.  **Readability**: Paragraphs must be short (max 3 sentences).
+        4.  **Emphasis**: You MUST use <strong> tags for specific SEO keywords and important concepts. Don't use markdown bold, use HTML tags.
+        5.  **Clean Code**: Return valid, semantic HTML strings (e.g. <h2>Title</h2><p>Content...</p>). Do NOT use Markdown.
+
         INSTRUCTIONS:
-        1. Generate content for EACH field in the schema.
-        2. For 'RichText' fields, use valid HTML (p, h2, ul, li, strong, etc.).
-        3. For 'Image' fields, leave them empty.
-        4. RETURN ONLY A SINGLE VALID JSON OBJECT.
+        1. Select keywords.
+        2. Generate content for EACH field in the schema, weaving in the selected keywords.
+        3. Adhere strictly to the FORMATTING RULES above for any RichText/Body fields.
+        4. For 'Image' fields, leave them empty.
+        5. RETURN ONLY A SINGLE VALID JSON OBJECT.
         
         Example Output JSON:
         {
