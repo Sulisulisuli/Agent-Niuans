@@ -17,21 +17,22 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
-import { getWebflowCollections, saveWebflowConfig } from '@/app/settings/actions'
+import { getWebflowCollections, saveWebflowConfig } from '@/app/(dashboard)/settings/actions'
 import { useRouter } from 'next/navigation'
 
 interface CollectionSwitcherProps {
     token: string
     siteId: string
     currentCollectionId: string
+    onCollectionChange?: (id: string) => void
 }
 
-export function CollectionSwitcher({ token, siteId, currentCollectionId }: CollectionSwitcherProps) {
+export function CollectionSwitcher({ token, siteId, currentCollectionId, onCollectionChange }: CollectionSwitcherProps) {
     const [open, setOpen] = useState(false)
     const [value, setValue] = useState(currentCollectionId)
     const [collections, setCollections] = useState<any[]>([])
     const [loading, setLoading] = useState(false)
-    const router = useRouter()
+    // Removed router usage here, moved to parent
 
     useEffect(() => {
         async function fetchCols() {
@@ -50,9 +51,9 @@ export function CollectionSwitcher({ token, siteId, currentCollectionId }: Colle
         setValue(collectionId)
         setOpen(false)
 
-        // Save to DB and Refresh
-        await saveWebflowConfig({ collectionId }, true)
-        router.refresh()
+        if (onCollectionChange) {
+            onCollectionChange(collectionId)
+        }
     }
 
     const currentName = collections.find((c) => c.id === value)?.displayName || "Select Collection..."

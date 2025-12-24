@@ -1,8 +1,8 @@
 'use server'
 
 import { createClient } from "@/utils/supabase/server"
-import { shareOnLinkedIn } from "@/app/posts/linkedin-server-actions"
-import { getWebflowItems } from "@/app/posts/actions"
+import { shareOnLinkedIn } from "@/app/(dashboard)/posts/linkedin-server-actions"
+import { getWebflowItems } from "@/app/(dashboard)/posts/actions"
 import { GoogleGenerativeAI } from "@google/generative-ai"
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "")
@@ -28,7 +28,7 @@ export async function getSites() {
         const sites = await webflow.listSites()
 
         // Fetch Organization Domain
-        const { getOrganizationProfile } = await import('@/app/settings/actions')
+        const { getOrganizationProfile } = await import('@/app/(dashboard)/settings/actions')
         const { orgDetails } = await getOrganizationProfile()
 
         // Inject organization domain into the SITE object (as a customDomain entry) if specific domain doesn't exist?
@@ -184,7 +184,7 @@ export async function generateLinkedInPost({ type, data, additionalInstructions 
         // Let's add the import to the top of the file in a separate edit or assume it's available.
         // Actually, let's import it properly.
 
-        const { getOrganizationProfile } = await import('@/app/settings/actions')
+        const { getOrganizationProfile } = await import('@/app/(dashboard)/settings/actions')
         const { profile } = await getOrganizationProfile()
 
         if (profile && Object.keys(profile).length > 0) {

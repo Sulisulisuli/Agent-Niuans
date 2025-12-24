@@ -1,14 +1,14 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
-import { AppSidebar } from '@/components/layout/app-sidebar'
+
 import WebflowSetup from './webflow-setup'
 import Link from 'next/link'
 import { AlertCircle } from 'lucide-react'
 
-import { CollectionSwitcher } from './collection-switcher'
 
-import DynamicPostEditor from './dynamic-post-editor'
-import { getWebflowCollection } from '@/app/settings/actions'
+
+import ClientPageContent from './client-page-content'
+import { getWebflowCollection } from '../settings/actions'
 
 export default async function PostsPage() {
     const supabase = await createClient()
@@ -79,35 +79,20 @@ export default async function PostsPage() {
     }
 
     return (
-        <div className="flex h-screen overflow-hidden bg-white">
-            <AppSidebar />
-            <main className="flex-1 overflow-y-auto">
-                <header className="flex h-14 lg:h-[60px] items-center justify-between border-b bg-white px-6">
-                    <h1 className="font-semibold text-lg">Content & Posts</h1>
-                    {isConfigured && siteId && (
-                        <div className="flex items-center gap-2">
-                            <span className="text-sm text-gray-500 hidden md:inline">Working Collection:</span>
-                            <CollectionSwitcher token={token} siteId={siteId} currentCollectionId={config.collectionId} />
-                        </div>
-                    )}
-                </header>
-
-                <div className="p-8">
-                    {!isConfigured ? (
-                        <WebflowSetup token={token} />
-                    ) : (
-                        <ClientPageContent
-                            fields={collectionFields}
-                            collectionId={config.collectionId}
-                            token={token}
-                            initialItems={initialItems}
-                        />
-                    )}
-                </div>
-            </main>
+        <div className="p-8">
+            {!isConfigured ? (
+                <WebflowSetup token={token} />
+            ) : (
+                <ClientPageContent
+                    fields={collectionFields}
+                    collectionId={config.collectionId}
+                    token={token}
+                    initialItems={initialItems}
+                />
+            )}
         </div>
     )
 }
 
-import ClientPageContent from './client-page-content'
+
 import { getWebflowItems } from './actions'

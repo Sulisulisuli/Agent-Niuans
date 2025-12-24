@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import DynamicPostEditor from './dynamic-post-editor'
+import EditorWrapper from './editor-wrapper'
 import PostList from './post-list'
 import { useRouter } from 'next/navigation'
 
@@ -61,7 +61,7 @@ export default function ClientPageContent({ fields, collectionId, token, initial
                 ← Back to List
             </button>
 
-            <DynamicPostEditor
+            <EditorWrapper
                 fields={fields}
                 collectionId={collectionId}
                 token={token}

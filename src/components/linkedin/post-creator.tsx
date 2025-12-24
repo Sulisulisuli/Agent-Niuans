@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
 import { FileText, Sparkles, Link as LinkIcon, Send, Image as ImageIcon } from "lucide-react"
-import { getPublishedArticles, generateLinkedInPost, publishToLinkedInProfile, getCollections, getSites, fetchOpenGraphImage } from "@/app/linkedin/actions"
+import { getPublishedArticles, generateLinkedInPost, publishToLinkedInProfile, getCollections, getSites, fetchOpenGraphImage } from "@/app/(dashboard)/linkedin/actions"
 
 export function LinkedInPostCreator() {
     const [content, setContent] = useState("")

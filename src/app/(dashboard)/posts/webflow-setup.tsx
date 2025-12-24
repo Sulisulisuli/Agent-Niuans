@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { getWebflowSites, getWebflowCollections, getWebflowCollection, createNewWebflowCollection, saveWebflowConfig } from '@/app/settings/actions'
+import { getWebflowSites, getWebflowCollections, getWebflowCollection, createNewWebflowCollection, saveWebflowConfig } from '@/app/(dashboard)/settings/actions'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
