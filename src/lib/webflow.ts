@@ -21,6 +21,21 @@ export interface WebflowCollection {
     }>
 }
 
+export interface WebflowItem {
+    id: string
+    isDraft: boolean
+    isArchived: boolean
+    lastPublished?: string
+    lastUpdated?: string
+    createdOn?: string
+    fieldData: {
+        name?: string
+        title?: string
+        slug?: string
+        [key: string]: any
+    }
+}
+
 export class WebflowClient {
     private token: string
     private baseUrl = 'https://api.webflow.com/v2'
