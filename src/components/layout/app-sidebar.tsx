@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { LayoutDashboard, FileText, Share2, Settings, LogOut } from "lucide-react"
+import { LayoutDashboard, FileText, Share2, Settings, LogOut, Linkedin } from "lucide-react"
 
 export function AppSidebar() {
     const pathname = usePathname()
@@ -11,6 +11,7 @@ export function AppSidebar() {
     const navItems = [
         { name: "Dashboard", href: "/", icon: LayoutDashboard },
         { name: "Posts (Webflow)", href: "/posts", icon: FileText },
+        { name: "LinkedIn", href: "/linkedin", icon: Linkedin },
         { name: "Distribution", href: "/distribution", icon: Share2 },
         { name: "Settings", href: "/settings", icon: Settings },
     ]

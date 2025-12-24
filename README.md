@@ -1,36 +1,80 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Agent Niuans
 
-## Getting Started
+Agent Niuans is a powerful, AI-driven Marketing Automation Platform designed to streamline content creation and multi-channel distribution. It serves as a central hub where marketing teams can generate high-quality content using AI, manage their Webflow CMS, and publish directly to LinkedIn.
 
-First, run the development server:
+## 🚀 Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### 🤖 AI Content Generation
+- **Context-Aware Writing**: Inject knowledge from external URLs or raw text notes to guide the AI.
+- **Powered by Gemini**: Utilizes Google's Gemini 1.5 Flash model for fast, high-quality, and nuanced text generation.
+- **Auto-Formatting**: Automatically populates complex Webflow CMS schemas (Rich Text, Plain Text).
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 🌐 Webflow Integration
+- **Seamless CMS Management**: Create and update CMS items directly from the dashboard.
+- **Dynamic Schemas**: Automatically adapts to your Webflow Collection structure.
+- **Media Handling**: Integrated image uploading and management.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 💼 LinkedIn Publishing
+- **Smart Sharing**: Share CMS posts, articles, or status updates.
+- **Link Previews**: Automatic Open Graph image fetching for beautiful link cards.
+- **Profile & Page Support**: Publish to your personal profile (Organization support coming soon).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🛠 Tech Stack
 
-## Learn More
+- **Frontend**: Next.js 15, React, Tailwind CSS v4, Shadcn UI.
+- **Backend/Auth**: Supabase (PostgreSQL).
+- **AI**: Google Generative AI SDK.
+- **Styling**: "Neo-Brutalist" design system (High contrast, 0px radius, Orange/Black/White).
 
-To learn more about Next.js, take a look at the following resources:
+## ⚡ Getting Started
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Prerequisites
+- Node.js 18+
+- Supabase Account
+- Webflow Account (for API access)
+- Google AI Studio Key (Gemini)
+- LinkedIn Developer App (Client ID/Secret)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Installation
 
-## Deploy on Vercel
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/your-org/agent-niuans.git
+    cd agent-niuans
+    ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+3.  **Environment Setup:**
+    Create a `.env.local` file in the root directory:
+    ```env
+    # Supabase
+    NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+    NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+    SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+
+    # Google AI
+    GOOGLE_GENERATIVE_AI_API_KEY=your_gemini_api_key
+
+    # LinkedIn
+    LINKEDIN_CLIENT_ID=your_linkedin_client_id
+    LINKEDIN_CLIENT_SECRET=your_linkedin_client_secret
+    LINKEDIN_REDIRECT_URI=http://localhost:3000/linkedin/callback
+
+    # Webflow
+    # (Tokens are usually managed per user in the DB, but system-wide tokens can go here if needed)
+    ```
+
+4.  **Run the development server:**
+    ```bash
+    npm run dev
+    ```
+
+5.  **Open the app:**
+    Navigate to [http://localhost:3000](http://localhost:3000).
+
+## 📄 License
+[MIT](LICENSE)

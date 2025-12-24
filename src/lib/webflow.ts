@@ -3,6 +3,10 @@ export interface WebflowSite {
     displayName: string
     shortName: string
     previewUrl: string
+    customDomains?: Array<{
+        id: string
+        url: string
+    }>
 }
 
 export interface WebflowCollection {

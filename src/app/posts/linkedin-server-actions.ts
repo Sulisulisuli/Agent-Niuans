@@ -11,46 +11,25 @@ export interface LinkedInShareResult {
 export async function shareOnLinkedIn(
     content: string,
     articleUrl?: string,
+    title?: string,
+    thumbnailUrl?: string,
     visibility: 'PUBLIC' | 'CONNECTIONS' = 'PUBLIC'
 ): Promise<LinkedInShareResult> {
     try {
+        // ... (existing auth logic unchanged) ...
         const supabase = await createClient()
         const { data: { user } } = await supabase.auth.getUser()
+        if (!user) return { success: false, error: 'Not authenticated' }
 
-        if (!user) {
-            return { success: false, error: 'User not authenticated' }
-        }
+        const { data: member } = await supabase.from('organization_members').select('organization_id').eq('user_id', user.id).single()
+        if (!member) return { success: false, error: 'No Org' }
 
-        // 1. Get Organization & LinkedIn Config
-        const { data: member } = await supabase
-            .from('organization_members')
-            .select('organization_id')
-            .eq('user_id', user.id)
-            .single()
-
-        if (!member) {
-            return { success: false, error: 'Organization not found' }
-        }
-
-        const { data: org } = await supabase
-            .from('organizations')
-            .select('linkedin_config')
-            .eq('id', member.organization_id)
-            .single()
-
+        const { data: org } = await supabase.from('organizations').select('linkedin_config').eq('id', member.organization_id).single()
         const config = org?.linkedin_config as any
+        if (!config?.accessToken || !config?.sub) return { success: false, error: 'LinkedIn Disconnected' }
 
-        if (!config || !config.accessToken || !config.sub) {
-            return { success: false, error: 'LinkedIn not connected' }
-        }
-
-        // 2. Refresh Token if needed (Simplified: Assuming token is valid for 60 days for now)
-        // ideally we check expiresAt and refresh if needed using client_secret
-
-        // 3. Prepare URN (Person)
         const authorUrn = `urn:li:person:${config.sub}`
 
-        // 4. Construct Request Body for UGC Post
         const body = {
             author: authorUrn,
             lifecycleState: "PUBLISHED",
@@ -66,7 +45,11 @@ export async function shareOnLinkedIn(
                             description: {
                                 text: "Read more"
                             },
-                            originalUrl: articleUrl
+                            originalUrl: articleUrl,
+                            title: {
+                                text: title || "New Post"
+                            },
+                            thumbnails: thumbnailUrl ? [{ url: thumbnailUrl }] : undefined
                         }
                     ] : undefined
                 }
@@ -75,6 +58,9 @@ export async function shareOnLinkedIn(
                 "com.linkedin.ugc.MemberNetworkVisibility": visibility
             }
         }
+
+
+        console.log("LinkedIn Request Body:", JSON.stringify(body, null, 2))
 
         // 5. Send Request
         const response = await fetch('https://api.linkedin.com/v2/ugcPosts', {
