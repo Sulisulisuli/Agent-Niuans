@@ -13,6 +13,17 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
 import { UploadCloud, X } from 'lucide-react'
 import { RichTextEditor } from '@/components/ui/rich-text-editor'
+import { Switch } from '@/components/ui/switch'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select'
+import { Badge } from '@/components/ui/badge'
+import { useEffect } from 'react'
+import { getWebflowItems } from './actions'
 
 
 function ImageUploader({ value, onChange }: { value: string, onChange: (url: string) => void }) {
@@ -91,6 +102,10 @@ interface WebflowField {
     slug: string
     displayName: string
     type: string
+    validations?: {
+        options?: Array<{ id: string, name: string }>
+        collectionId?: string
+    }
 }
 
 interface DynamicPostEditorProps {
@@ -119,7 +134,34 @@ export default function DynamicPostEditor({ fields, collectionId, token, initial
     const [contextText, setContextText] = useState('')
     const [generatedKeywords, setGeneratedKeywords] = useState<string[]>([])
 
+    // Reference data storage
+    const [referenceData, setReferenceData] = useState<Record<string, any[]>>({})
+
     const router = useRouter()
+
+    useEffect(() => {
+        const fetchReferenceData = async () => {
+            const refFields = fields.filter(f => f.type === 'Reference' || f.type === 'MultiReference')
+            if (refFields.length === 0) return
+
+            console.log('Fetching reference data for fields:', refFields.map(f => f.slug))
+
+            const newData: Record<string, any[]> = { ...referenceData }
+
+            for (const field of refFields) {
+                const targetCollectionId = field.validations?.collectionId
+                if (targetCollectionId && !newData[targetCollectionId]) {
+                    const res = await getWebflowItems(token, targetCollectionId)
+                    if (res.items) {
+                        newData[targetCollectionId] = res.items
+                    }
+                }
+            }
+            setReferenceData(newData)
+        }
+
+        fetchReferenceData()
+    }, [fields, token])
 
     const handleAiGenerate = async () => {
         if (!prompt.trim()) return
@@ -366,9 +408,122 @@ export default function DynamicPostEditor({ fields, collectionId, token, initial
                                 />
                             )}
 
+                            {field.type === 'Number' && (
+                                <Input
+                                    type="number"
+                                    className="rounded-none border-black h-12 text-lg"
+                                    placeholder={`Enter ${field.displayName}...`}
+                                    value={formData[field.slug] ?? ''}
+                                    onChange={(e) => {
+                                        const val = e.target.value
+                                        handleChange(field.slug, val === '' ? null : parseFloat(val))
+                                    }}
+                                />
+                            )}
+
+                            {field.type === 'Switch' && (
+                                <div className="flex items-center space-x-2">
+                                    <Switch
+                                        id={field.id}
+                                        checked={!!formData[field.slug]}
+                                        onCheckedChange={(checked) => handleChange(field.slug, checked)}
+                                    />
+                                    <Label htmlFor={field.id} className="text-sm font-normal text-gray-500">
+                                        {formData[field.slug] ? 'Enabled' : 'Disabled'}
+                                    </Label>
+                                </div>
+                            )}
+
+                            {field.type === 'Option' && (
+                                <Select
+                                    value={formData[field.slug] || ''}
+                                    onValueChange={(value) => handleChange(field.slug, value)}
+                                >
+                                    <SelectTrigger className="rounded-none border-black h-12">
+                                        <SelectValue placeholder={`Select ${field.displayName}...`} />
+                                    </SelectTrigger>
+                                    <SelectContent className="rounded-none border-black">
+                                        {field.validations?.options?.map((opt) => (
+                                            <SelectItem key={opt.id} value={opt.id}>
+                                                {opt.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            )}
+
+                            {field.type === 'Reference' && (
+                                <Select
+                                    value={formData[field.slug] || ''}
+                                    onValueChange={(value) => handleChange(field.slug, value)}
+                                >
+                                    <SelectTrigger className="rounded-none border-black h-12">
+                                        <SelectValue placeholder={`Select ${field.displayName}...`} />
+                                    </SelectTrigger>
+                                    <SelectContent className="rounded-none border-black">
+                                        {field.validations?.collectionId && referenceData[field.validations.collectionId]?.map((item) => (
+                                            <SelectItem key={item.id} value={item.id}>
+                                                {item.fieldData.name || item.fieldData.title || item.id}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            )}
+
+                            {field.type === 'MultiReference' && (
+                                <div className="space-y-4">
+                                    <Select
+                                        onValueChange={(value) => {
+                                            const current = formData[field.slug] || []
+                                            if (!current.includes(value)) {
+                                                handleChange(field.slug, [...current, value])
+                                            }
+                                        }}
+                                    >
+                                        <SelectTrigger className="rounded-none border-black h-12">
+                                            <SelectValue placeholder={`Add ${field.displayName}...`} />
+                                        </SelectTrigger>
+                                        <SelectContent className="rounded-none border-black">
+                                            {field.validations?.collectionId && referenceData[field.validations.collectionId]?.map((item) => (
+                                                <SelectItem key={item.id} value={item.id}>
+                                                    {item.fieldData.name || item.fieldData.title || item.id}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+
+                                    <div className="flex flex-wrap gap-2 min-h-[40px] p-2 border border-black/10 bg-gray-50/50">
+                                        {(formData[field.slug] || []).length === 0 && (
+                                            <span className="text-xs text-gray-400 italic p-1">No {field.displayName.toLowerCase()} selected</span>
+                                        )}
+                                        {(formData[field.slug] || []).map((itemId: string) => {
+                                            const item = field.validations?.collectionId && referenceData[field.validations.collectionId]?.find(i => i.id === itemId)
+                                            return (
+                                                <Badge
+                                                    key={itemId}
+                                                    variant="secondary"
+                                                    className="rounded-none border border-black/20 bg-white text-black px-2 py-1 flex items-center gap-1 group"
+                                                >
+                                                    {item?.fieldData.name || item?.fieldData.title || itemId}
+                                                    <button
+                                                        onClick={() => {
+                                                            const current = formData[field.slug] || []
+                                                            handleChange(field.slug, current.filter((id: string) => id !== itemId))
+                                                        }}
+                                                        className="hover:text-red-500 transition-colors"
+                                                    >
+                                                        <X className="h-3 w-3" />
+                                                    </button>
+                                                </Badge>
+                                            )
+                                        })}
+                                    </div>
+                                </div>
+                            )}
+
                             {/* Fallback for other types */}
 
-                            {!['PlainText', 'RichText', 'Image'].includes(field.type) && (
+                            {!['PlainText', 'RichText', 'Image', 'Number', 'Switch', 'Option', 'Reference', 'MultiReference'].includes(field.type) && (
                                 <Input
                                     className="rounded-none border-gray-300 bg-gray-50"
                                     disabled
