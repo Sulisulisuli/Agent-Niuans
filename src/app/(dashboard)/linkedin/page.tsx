@@ -50,7 +50,9 @@ export default async function LinkedInPage() {
             {/* Content */}
             <div className="flex-1 p-8 overflow-y-auto">
                 {isConnected ? (
-                    <LinkedInPostCreator />
+                    <LinkedInPostCreator
+                        organizationId={organization?.linkedin_config?.organizationId}
+                    />
                 ) : (
                     <div className="max-w-2xl mx-auto mt-20 text-center">
                         <div className="bg-white p-12 rounded-xl shadow-sm border border-gray-100">

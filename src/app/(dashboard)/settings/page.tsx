@@ -76,6 +76,7 @@ export default async function SettingsPage() {
                     >
                         <LinkedInConnect
                             isConnected={isLinkedinConnected}
+                            organizationId={linkedinConfig.organizationId}
                         />
                     </IntegrationCard>
                 </div>

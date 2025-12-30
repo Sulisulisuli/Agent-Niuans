@@ -9,9 +9,11 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
 import { FileText, Sparkles, Link as LinkIcon, Send, Image as ImageIcon } from "lucide-react"
 import { getPublishedArticles, generateLinkedInPost, publishToLinkedInProfile, getCollections, getSites, fetchOpenGraphImage } from "@/app/(dashboard)/linkedin/actions"
+import { cn } from "@/lib/utils"
 
-export function LinkedInPostCreator() {
+export function LinkedInPostCreator({ organizationId }: { organizationId?: string }) {
     const [content, setContent] = useState("")
+    const [authorType, setAuthorType] = useState<'person' | 'organization'>('person')
     const [linkUrl, setLinkUrl] = useState("") // For "From Link" mode or "Article" media
     const [previewImageUrl, setPreviewImageUrl] = useState("") // For visualizing the link preview card
     const [prompt, setPrompt] = useState("")
@@ -198,7 +200,7 @@ export function LinkedInPostCreator() {
             title = selectedItem.title || "New Post"
         }
 
-        const res = await publishToLinkedInProfile(content, linkUrl, title, previewImageUrl)
+        const res = await publishToLinkedInProfile(content, linkUrl, title, previewImageUrl, authorType, organizationId)
         setIsPublishing(false)
         if (res.success) {
             alert("Post published successfully!")
@@ -213,6 +215,37 @@ export function LinkedInPostCreator() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-[calc(100vh-140px)]">
             {/* Left Panel: Input & Generation */}
             <div className="flex flex-col gap-6">
+                <div className="flex items-center justify-between mb-4 bg-gray-50 p-3 border rounded-lg">
+                    <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold uppercase text-gray-400">Post As:</span>
+                        <div className="flex border p-0.5 bg-white rounded-md">
+                            <button
+                                onClick={() => setAuthorType('person')}
+                                className={cn(
+                                    "px-3 py-1.5 text-xs font-semibold rounded transition-colors",
+                                    authorType === 'person' ? "bg-black text-white" : "hover:bg-gray-100"
+                                )}
+                            >
+                                Personal Profile
+                            </button>
+                            <button
+                                onClick={() => setAuthorType('organization')}
+                                disabled={!organizationId}
+                                className={cn(
+                                    "px-3 py-1.5 text-xs font-semibold rounded transition-colors",
+                                    !organizationId && "opacity-30 cursor-not-allowed",
+                                    authorType === 'organization' ? "bg-black text-white" : "hover:bg-gray-100"
+                                )}
+                            >
+                                Organization
+                            </button>
+                        </div>
+                    </div>
+                    {!organizationId && (
+                        <span className="text-[10px] text-gray-400">Configure Org ID in settings</span>
+                    )}
+                </div>
+
                 <Tabs defaultValue="cms" className="w-full">
                     <TabsList className="grid w-full grid-cols-3 mb-6">
                         <TabsTrigger value="cms" className="gap-2">

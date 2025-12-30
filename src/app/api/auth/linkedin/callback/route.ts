@@ -88,10 +88,19 @@ export async function GET(request: Request) {
             .single()
 
         if (member) {
+            // Fetch current config to merge
+            const { data: org } = await supabase
+                .from('organizations')
+                .select('linkedin_config')
+                .eq('id', member.organization_id)
+                .single()
+
+            const currentConfig = (org?.linkedin_config as any) || {}
+
             await supabase
                 .from('organizations')
                 .update({
-                    linkedin_config: linkedinConfig
+                    linkedin_config: { ...currentConfig, ...linkedinConfig }
                 })
                 .eq('id', member.organization_id)
         }

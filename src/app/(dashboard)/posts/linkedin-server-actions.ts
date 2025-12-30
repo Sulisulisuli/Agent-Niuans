@@ -13,10 +13,11 @@ export async function shareOnLinkedIn(
     articleUrl?: string,
     title?: string,
     thumbnailUrl?: string,
-    visibility: 'PUBLIC' | 'CONNECTIONS' = 'PUBLIC'
+    visibility: 'PUBLIC' | 'CONNECTIONS' = 'PUBLIC',
+    authorType: 'person' | 'organization' = 'person',
+    organizationId?: string
 ): Promise<LinkedInShareResult> {
     try {
-        // ... (existing auth logic unchanged) ...
         const supabase = await createClient()
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) return { success: false, error: 'Not authenticated' }
@@ -28,7 +29,14 @@ export async function shareOnLinkedIn(
         const config = org?.linkedin_config as any
         if (!config?.accessToken || !config?.sub) return { success: false, error: 'LinkedIn Disconnected' }
 
-        const authorUrn = `urn:li:person:${config.sub}`
+        let authorUrn = `urn:li:person:${config.sub}`
+
+        if (authorType === 'organization') {
+            if (!organizationId) return { success: false, error: 'Organization ID not configured' }
+            // Clean the organization ID to ensure it's just the number
+            const cleanOrgId = organizationId.replace('urn:li:organization:', '')
+            authorUrn = `urn:li:organization:${cleanOrgId}`
+        }
 
         const body = {
             author: authorUrn,

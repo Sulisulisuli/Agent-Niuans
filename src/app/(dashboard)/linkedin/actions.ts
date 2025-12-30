@@ -279,9 +279,16 @@ export async function fetchOpenGraphImage(url: string) {
 
 // --- Publishing ---
 
-export async function publishToLinkedInProfile(content: string, linkUrl?: string, title?: string, thumbnailUrl?: string) {
+export async function publishToLinkedInProfile(
+    content: string,
+    linkUrl?: string,
+    title?: string,
+    thumbnailUrl?: string,
+    authorType: 'person' | 'organization' = 'person',
+    organizationId?: string
+) {
     // Wrapper to keep logic clean and add any future dashboard-specific logging
-    return await shareOnLinkedIn(content, linkUrl || undefined, title, thumbnailUrl, "PUBLIC")
+    return await shareOnLinkedIn(content, linkUrl || undefined, title, thumbnailUrl, "PUBLIC", authorType, organizationId)
 }
 
 // Helper to avoid duplicate DB calls

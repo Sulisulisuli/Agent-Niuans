@@ -255,3 +255,57 @@ export async function updateOrganizationDetails(name: string, domain: string) {
     revalidatePath('/settings/organization')
     return { success: true }
 }
+export async function updateLinkedInConfig(config: any) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Not authenticated')
+
+    const { data: member } = await supabase
+        .from('organization_members')
+        .select('organization_id')
+        .eq('user_id', user.id)
+        .single()
+
+    if (!member) throw new Error('No organization')
+
+    const { data: org } = await supabase.from('organizations').select('linkedin_config').eq('id', member.organization_id).single()
+    const currentConfig = org?.linkedin_config as any || {}
+
+    const { error } = await supabase
+        .from('organizations')
+        .update({
+            linkedin_config: { ...currentConfig, ...config }
+        })
+        .eq('id', member.organization_id)
+
+    if (error) throw new Error('Failed to update LinkedIn config: ' + error.message)
+
+    revalidatePath('/settings')
+    return { success: true }
+}
+
+export async function disconnectLinkedIn() {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Not authenticated')
+
+    const { data: member } = await supabase
+        .from('organization_members')
+        .select('organization_id')
+        .eq('user_id', user.id)
+        .single()
+
+    if (!member) throw new Error('No organization')
+
+    const { error } = await supabase
+        .from('organizations')
+        .update({
+            linkedin_config: null
+        })
+        .eq('id', member.organization_id)
+
+    if (error) throw new Error('Failed to disconnect LinkedIn: ' + error.message)
+
+    revalidatePath('/settings')
+    return { success: true }
+}
