@@ -58,7 +58,11 @@ export function LinkedInConnect({ isConnected, organizationId: initialOrgId, onC
                     : "Connect your LinkedIn account to automatically publish content and analyze engagement."}
             </div>
 
-            {isConnected && (
+            {/* 
+                Hiding Organization ID input until Marketing Developer Platform is approved by LinkedIn.
+                This prevents confusion while the feature is technically waiting for API permissions.
+            */}
+            {/* isConnected && (
                 <div className="space-y-4 pt-4 border-t border-gray-100">
                     <div className="space-y-2">
                         <Label htmlFor="orgId" className="text-xs font-bold uppercase tracking-wider text-gray-400">
@@ -91,7 +95,7 @@ export function LinkedInConnect({ isConnected, organizationId: initialOrgId, onC
                         </p>
                     </div>
                 </div>
-            )}
+            ) */}
 
             <div className="flex actions">
                 {isConnected ? (

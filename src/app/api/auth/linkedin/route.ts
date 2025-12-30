@@ -21,8 +21,9 @@ export async function GET(request: Request) {
     const redirectUri = `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/linkedin/callback`
     const state = Math.random().toString(36).substring(7)
 
-    // Scopes needed for posting and profile info
-    const scope = encodeURIComponent('w_member_social w_organization_social openid profile email')
+    // NOTE: w_organization_social requires "Marketing Developer Platform" product in LinkedIn Portal
+    // Adding it without approval causes a "Bummer, something went wrong" error on LinkedIn.
+    const scope = encodeURIComponent('w_member_social openid profile email')
 
     if (!clientId) {
         return Response.json({ error: 'LinkedIn Client ID not configured' }, { status: 500 })

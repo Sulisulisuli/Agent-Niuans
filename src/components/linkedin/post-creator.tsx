@@ -215,7 +215,10 @@ export function LinkedInPostCreator({ organizationId }: { organizationId?: strin
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-[calc(100vh-140px)]">
             {/* Left Panel: Input & Generation */}
             <div className="flex flex-col gap-6">
-                <div className="flex items-center justify-between mb-4 bg-gray-50 p-3 border rounded-lg">
+                {/* 
+                    Hiding Author Selection until Marketing Developer Platform is approved by LinkedIn.
+                */}
+                {/* <div className="flex items-center justify-between mb-4 bg-gray-50 p-3 border rounded-lg">
                     <div className="flex items-center gap-2">
                         <span className="text-xs font-bold uppercase text-gray-400">Post As:</span>
                         <div className="flex border p-0.5 bg-white rounded-md">
@@ -244,7 +247,7 @@ export function LinkedInPostCreator({ organizationId }: { organizationId?: strin
                     {!organizationId && (
                         <span className="text-[10px] text-gray-400">Configure Org ID in settings</span>
                     )}
-                </div>
+                </div> */}
 
                 <Tabs defaultValue="cms" className="w-full">
                     <TabsList className="grid w-full grid-cols-3 mb-6">
