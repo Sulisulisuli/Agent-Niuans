@@ -75,6 +75,8 @@
 - `organizations`: Tenant management.
 - `posts`: Local mirror of content items (Draft/Published status).
 - `post_distributions`: Tracks where a post has been shared (LinkedIn, etc.).
+- `image_templates`: Stores Open Graph image templates (JSON configuration, organization mapping, and metadata).
+- `template-assets` (Storage): Public Supabase bucket for template-related assets like background images and icons.
 
 ## Development Guidelines
 1.  **Server Actions**: Use `server-only` actions for all API integrations (Webflow, LinkedIn, AI).
