@@ -19,6 +19,13 @@ Agent Niuans is a powerful, AI-driven Marketing Automation Platform designed to 
 - **Link Previews**: Automatic Open Graph image fetching for beautiful link cards.
 - **Profile & Page Support**: Publish to your personal profile (Organization support coming soon).
 
+### 🎨 Visual Template Designer
+- **Drag & Drop Builder**: Intuitive visual editor for creating Open Graph image templates.
+- **Dynamic Data Binding**: Link layers to live content (e.g., Post Title, Author Avatar) for automated generation.
+- **Smart Tools**: Auto-fit text sizing, generic layer rotation, and shape tools.
+- **SVG Support**: Paste raw SVG code directly for custom graphics and logos.
+- **Template Management**: Create, save, and manage multiple reusable branded templates.
+
 ## 🛠 Tech Stack
 
 - **Frontend**: Next.js 15, React, Tailwind CSS v4, Shadcn UI.

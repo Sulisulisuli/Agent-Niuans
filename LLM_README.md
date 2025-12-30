@@ -62,6 +62,14 @@
     - **Field Mapping**: Automatically maps generated content to Webflow Schema fields (slugs).
     - **Keyword Generation**: Extracts SEO keywords.
 
+### 4. Dynamic Template Engine
+- **Visual Designer**: A React-based drag-and-drop editor (`TemplateBuilder`) for creating Open Graph templates.
+- **Rendering Engine**: Uses `satori` and `@vercel/og` to convert HTML/CSS templates into dynamic PNG images on the Edge.
+- **Dynamic Binding**:
+    - Layers can be bound to `variableId` (e.g., `title`, `authorAvatar`).
+    - Engine resolves variables against content data at runtime.
+- **Features**: Auto-fit text (heuristic-based), generic rotation, raw SVG rendering, and Z-index management.
+
 ## Database Schema Highlights
 - `profiles`: Linked to Supabase Auth, stores `linkedin_access_token`, `linkedin_urn`.
 - `organizations`: Tenant management.

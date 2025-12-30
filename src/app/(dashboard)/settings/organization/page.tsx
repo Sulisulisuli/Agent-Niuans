@@ -30,6 +30,7 @@ export default async function OrganizationSettingsPage() {
                 <nav className="flex gap-4">
                     <a href="/settings" className="text-sm font-medium text-gray-400 hover:text-black transition-colors pb-5 mt-5 border-b-2 border-transparent hover:border-gray-200">Integrations</a>
                     <a href="/settings/organization" className="text-sm font-medium border-b-2 border-black pb-5 mt-5">Brand & General</a>
+                    <a href="/settings/templates" className="text-sm font-medium text-gray-400 hover:text-black transition-colors pb-5 mt-5 border-b-2 border-transparent hover:border-gray-200">Templates</a>
                 </nav>
             </header>
 
