@@ -56,11 +56,13 @@
 - **Auth**: Handles LinkedIn OAuth tokens stored in `profiles` table.
 
 ### 3. AI Content Generator
-- **Engine**: Gemini 1.5 Flash.
+- **Engine**: Gemini 1.5 Flash (Text) & **Gemini 2.5 Flash / Imagen 3** (Image).
 - **Capabilities**:
-    - **Context Injection**: Can read from a provided URL or pasted text to ground the generation.
+    - **Magic Fill**: Generates titles, subtitles, and SEO keywords from minimal context.
+    - **Visual Generation**: Creates on-brand images using `gemini-2.5-flash-image`.
+    - **Alt Text**: Auto-generates accessibility descriptions for images.
     - **Field Mapping**: Automatically maps generated content to Webflow Schema fields (slugs).
-    - **Keyword Generation**: Extracts SEO keywords.
+    - **Smart Sync**: Normalized data flow ensures correct handling of complex objects (e.g. `{ url, alt }`) when pushing to Webflow API V2.
 
 ### 4. Dynamic Template Engine
 - **Visual Designer**: A React-based drag-and-drop editor (`TemplateBuilder`) for creating Open Graph templates.

@@ -5,8 +5,9 @@ Agent Niuans is a powerful, AI-driven Marketing Automation Platform designed to 
 ## 🚀 Features
 
 ### 🤖 AI Content Generation
-- **Context-Aware Writing**: Inject knowledge from external URLs or raw text notes to guide the AI.
-- **Powered by Gemini**: Utilizes Google's Gemini 1.5 Flash model for fast, high-quality, and nuanced text generation.
+- **Magic Fill**: One-click generation of post content (Title = Post), including rich text bodies and SEO keywords.
+- **Visual AI**: Integrated Text-to-Image generation using **Google Imagen 3 (Gemini 2.5)**.
+- **Context-Aware**: Inject knowledge from external URLs or raw text notes to guide the AI.
 - **Auto-Formatting**: Automatically populates complex Webflow CMS schemas (Rich Text, Plain Text).
 
 ### 🌐 Webflow Integration

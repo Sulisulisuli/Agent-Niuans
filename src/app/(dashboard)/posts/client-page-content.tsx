@@ -10,9 +10,10 @@ interface ClientPageContentProps {
     collectionId: string
     token: string
     initialItems: any[]
+    organizationId: string
 }
 
-export default function ClientPageContent({ fields, collectionId, token, initialItems }: ClientPageContentProps) {
+export default function ClientPageContent({ fields, collectionId, token, initialItems, organizationId }: ClientPageContentProps) {
     const [view, setView] = useState<'list' | 'create' | 'edit'>('list')
     const [editingItem, setEditingItem] = useState<any>(null)
     const router = useRouter()
@@ -67,6 +68,7 @@ export default function ClientPageContent({ fields, collectionId, token, initial
                 token={token}
                 initialData={editingItem}
                 onSuccess={handleSuccess}
+                organizationId={organizationId}
             />
         </div>
     )

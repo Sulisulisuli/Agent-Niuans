@@ -48,6 +48,9 @@ export interface TemplateElement {
     src?: string; // For images
     iconName?: string; // For icons
     variableId?: string; // Dynamic Data Binding
+    // Image Upload Features
+    isUploadable?: boolean;
+    placeholderText?: string;
 }
 
 export interface ContentData {
@@ -256,7 +259,19 @@ function getFittingFontSize(text: string, maxWidth: number, startFontSize: numbe
 }
 
 // --- CustomLayout ---
-export const CustomLayout = ({ config, content, onLayerSelect, selectedLayerId }: { config: TemplateConfig; content: ContentData; onLayerSelect?: (id: string) => void; selectedLayerId?: string }) => (
+export const CustomLayout = ({
+    config,
+    content,
+    onLayerSelect,
+    selectedLayerId,
+    onUploadRequest // Callback for uploadable images
+}: {
+    config: TemplateConfig;
+    content: ContentData;
+    onLayerSelect?: (id: string) => void;
+    selectedLayerId?: string;
+    onUploadRequest?: (layerId: string) => void;
+}) => (
     <div
         style={{
             height: '100%',
@@ -328,11 +343,88 @@ export const CustomLayout = ({ config, content, onLayerSelect, selectedLayerId }
                     (layer.variableId && content[layer.variableId as keyof ContentData] ? content[layer.variableId as keyof ContentData] : layer.content)
                 )}
                 {layer.type === 'image' && (
-                    <img
-                        src={(layer.variableId && content[layer.variableId as keyof ContentData] ? content[layer.variableId as keyof ContentData] : layer.src) as string}
-                        alt=""
-                        style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: layer.styles.borderRadius, pointerEvents: 'none' }}
-                    />
+                    <>
+                        {/* Normal Image Rendering */}
+                        <img
+                            src={(layer.variableId && content[layer.variableId as keyof ContentData] ? content[layer.variableId as keyof ContentData] : layer.src) as string}
+                            alt=""
+                            style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                                borderRadius: layer.styles.borderRadius,
+                                pointerEvents: 'none',
+                                opacity: layer.isUploadable && !layer.src && !(layer.variableId && content[layer.variableId as keyof ContentData]) ? 0 : 1 // Hide if placeholder needs to show
+                            }}
+                        />
+
+                        {/* Uploadable Placeholder Overlay */}
+                        {layer.isUploadable && (!layer.src && !(layer.variableId && content[layer.variableId as keyof ContentData])) && (
+                            <div
+                                style={{
+                                    position: 'absolute',
+                                    inset: 0,
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    backgroundColor: '#f3f4f6',
+                                    border: '2px dashed #d1d5db',
+                                    borderRadius: layer.styles.borderRadius,
+                                    color: '#6b7280',
+                                    cursor: onUploadRequest ? 'pointer' : 'default',
+                                    zIndex: 10
+                                }}
+                                onClick={(e) => {
+                                    if (onUploadRequest) {
+                                        e.stopPropagation(); // Prevent layer selection if we want to upload
+                                        onUploadRequest(layer.id);
+                                    }
+                                }}
+                            >
+                                <div style={{ marginBottom: 4 }}>
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                        <polyline points="17 8 12 3 7 8" />
+                                        <line x1="12" y1="3" x2="12" y2="15" />
+                                    </svg>
+                                </div>
+                                <div style={{ fontSize: 12, textAlign: 'center', padding: '0 8px' }}>
+                                    {layer.placeholderText || 'Click to Upload'}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Hover State for Uploadable Images that HAVE content */}
+                        {layer.isUploadable && (layer.src || (layer.variableId && content[layer.variableId as keyof ContentData])) && onUploadRequest && (
+                            <div
+                                className="upload-overlay" // Use a class if possible, or inline styles
+                                style={{
+                                    position: 'absolute',
+                                    inset: 0,
+                                    backgroundColor: 'rgba(0,0,0,0.4)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    opacity: 0, // Hidden by default
+                                    transition: 'opacity 0.2s',
+                                    cursor: 'pointer',
+                                    borderRadius: layer.styles.borderRadius,
+                                    zIndex: 11
+                                }}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onUploadRequest(layer.id);
+                                }}
+                                onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+                                onMouseLeave={(e) => e.currentTarget.style.opacity = '0'}
+                            >
+                                <span style={{ color: 'white', fontSize: 12, fontWeight: 500 }}>
+                                    Change Image
+                                </span>
+                            </div>
+                        )}
+                    </>
                 )}
                 {layer.type === 'svg' && layer.content && (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -352,9 +444,23 @@ export const CustomLayout = ({ config, content, onLayerSelect, selectedLayerId }
     </div>
 );
 
-export function getTemplateElement(config: TemplateConfig, content: ContentData): ReactNode {
+export function getTemplateElement(
+    config: TemplateConfig,
+    content: ContentData,
+    callbacks?: {
+        onLayerSelect?: (id: string) => void;
+        selectedLayerId?: string;
+        onUploadRequest?: (layerId: string) => void;
+    }
+): ReactNode {
     if (config.layout === 'custom') {
-        return <CustomLayout config={config} content={content} />;
+        return <CustomLayout
+            config={config}
+            content={content}
+            onLayerSelect={callbacks?.onLayerSelect}
+            selectedLayerId={callbacks?.selectedLayerId}
+            onUploadRequest={callbacks?.onUploadRequest}
+        />;
     }
 
     switch (config.layout) {

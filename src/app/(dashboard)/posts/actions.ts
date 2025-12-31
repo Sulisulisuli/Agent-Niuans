@@ -12,9 +12,6 @@ export async function createWebflowPost(token: string, collectionId: string, for
 
         console.log('createWebflowPost: Starting', { collectionId, formData })
 
-        // 1. Validate data
-        // TODO: Add stricter validation based on schema if needed
-
         // 2. Send to Webflow
         const webflow = new WebflowClient(token)
         const result = await webflow.createItem(collectionId, formData)

@@ -243,3 +243,102 @@ export async function generateBrandProfileFromUrl(url: string) {
         return { error: error.message || 'Unknown error' }
     }
 }
+
+export async function generateTemplateContent(context: string, organizationId: string) {
+    if (!process.env.GEMINI_API_KEY) return { error: 'Gemini API Key not configured' }
+
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" })
+
+    // 1. Fetch Brand Identity
+    const { profile } = await getOrganizationProfile()
+    const brandProfile = profile || {}
+
+    // 2. Construct Prompt
+    const prompt = `
+    You are a creative social media assistant.
+    
+    BRAND IDENTITY:
+    ${JSON.stringify(brandProfile, null, 2)}
+    
+    POST CONTEXT:
+    ${context}
+    
+    TASK:
+    Based on the post context and brand identity, generate content for a social media image template.
+    1. Title: A short, catchy title (max 6 words).
+    2. Subtitle: A supporting subtitle (max 10 words).
+    3. Image Prompt: A detailed English prompt for an text-to-image model (like Midjourney/DALL-E) that would generate a background or main image fitting the brand style and post subject.
+    4. Alt Text: A concise, descriptive alt text for the generated image (max 15 words) suitable for accessibility and SEO.
+    
+    Return ONLY a JSON object with keys: "title", "subtitle", "imagePrompt", "altText".
+    Do not include markdown formatting.
+    `
+
+    try {
+        const result = await model.generateContent(prompt)
+        const response = await result.response
+        const text = response.text()
+
+        const jsonStr = text.replace(/```json/g, '').replace(/```/g, '').trim()
+        const data = JSON.parse(jsonStr)
+
+        return { data }
+
+    } catch (e: any) {
+        console.error('AI Generation Error:', e)
+        return { error: 'Failed to generate content' }
+    }
+}
+
+import { createClient } from '@/utils/supabase/server'
+
+export async function generateImage(prompt: string) {
+    if (!process.env.GEMINI_API_KEY) return { error: 'Gemini API Key missing' }
+
+    try {
+        // Use the specific Nano Banana model from the docs
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-image" })
+
+        const result = await model.generateContent(prompt)
+        const response = await result.response
+
+        // Imagen responses via the Generative AI SDK (API v1beta) often come in a specific format
+        // We need to check for inline data
+        const parts = response.candidates?.[0]?.content?.parts
+
+        // Use a more robust check for image data
+        const imagePart = parts?.find((p: any) => p.inlineData && p.inlineData.mimeType.startsWith('image/'))
+
+        if (!imagePart || !imagePart.inlineData) {
+            console.log('No image part found. Parts:', JSON.stringify(parts))
+            return { error: 'No image generated. The model might have refused the prompt or returned text.' }
+        }
+
+        const base64Image = imagePart.inlineData.data
+        const mimeType = imagePart.inlineData.mimeType || 'image/png'
+        const ext = mimeType.split('/')[1] || 'png'
+
+        // Upload to Supabase
+        const supabase = await createClient()
+        const fileName = `ai-gen-${Date.now()}.${ext}`
+        const buffer = Buffer.from(base64Image, 'base64')
+
+        const { error: uploadError } = await supabase.storage
+            .from('post-images')
+            .upload(fileName, buffer, {
+                contentType: mimeType
+            })
+
+        if (uploadError) throw uploadError
+
+        const { data: publicUrlData } = supabase.storage
+            .from('post-images')
+            .getPublicUrl(fileName)
+
+        return { url: publicUrlData.publicUrl }
+
+    } catch (e: any) {
+        console.error('Image Generation Error:', e)
+        return { error: e.message || 'Failed to generate image' }
+    }
+}

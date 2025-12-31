@@ -24,10 +24,20 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { useEffect } from 'react'
 import { getWebflowItems } from './actions'
+import { ImageGenerator } from './image-generator'
 
-
-function ImageUploader({ value, onChange }: { value: string, onChange: (url: string) => void }) {
+// Enhanced ImageUploader to support string or object value { url, alt }
+function ImageUploader({ value, onChange }: { value: string | { url: string, alt?: string }, onChange: (url: string | { url: string, alt?: string }) => void }) {
     const [uploading, setUploading] = useState(false)
+
+    // Normalize value to get URL string
+    const getImageUrl = (val: any) => {
+        if (!val) return ''
+        if (typeof val === 'string') return val
+        return val.url || ''
+    }
+
+    const currentUrl = getImageUrl(value)
 
     const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
@@ -49,7 +59,13 @@ function ImageUploader({ value, onChange }: { value: string, onChange: (url: str
             }
 
             const { data } = supabase.storage.from('post-images').getPublicUrl(filePath)
-            onChange(data.publicUrl)
+
+            // If value was an object, update the url property but keep object structure?
+            // Actually, for basic uploader we might as well upgrade to object structure if not already.
+            // But let's respect the type. If it was string, keep string? No, Webflow prefers consistency.
+            // Let's return object if we can, but onChange expects matching type.
+            // For now, let's just return the object structure { url, alt: '' } to start being consistent.
+            onChange({ url: data.publicUrl, alt: '' })
         } catch (error) {
             console.error('Error uploading image:', error)
             alert('Failed to upload image')
@@ -58,12 +74,17 @@ function ImageUploader({ value, onChange }: { value: string, onChange: (url: str
         }
     }
 
-    if (value) {
+    // Handle clearing the image
+    const handleClear = () => {
+        onChange('') // Or null? Typically forms handle empty string better.
+    }
+
+    if (currentUrl) {
         return (
             <div className="relative group w-full max-w-sm">
-                <img src={value} alt="Uploaded" className="w-full h-48 object-cover rounded-none border border-black" />
+                <img src={currentUrl} alt="Uploaded" className="w-full h-48 object-cover rounded-none border border-black" />
                 <button
-                    onClick={() => onChange('')}
+                    onClick={handleClear}
                     className="absolute top-2 right-2 bg-white/90 p-1 hover:bg-red-50 hover:text-red-500 transition-colors border border-black"
                 >
                     <X className="h-4 w-4" />
@@ -114,9 +135,10 @@ interface DynamicPostEditorProps {
     token: string
     initialData?: any // Optional initial data for editing
     onSuccess?: () => void
+    organizationId?: string
 }
 
-export default function DynamicPostEditor({ fields, collectionId, token, initialData, ...props }: DynamicPostEditorProps) {
+export default function DynamicPostEditor({ fields, collectionId, token, initialData, organizationId, ...props }: DynamicPostEditorProps) {
     // State to hold form values dynamic to the schema
     // Initialize with initialData if present (fieldData is usually nested in item response, but let's assume raw field map is passed)
     // If passing full item object, we might need to access item.fieldData
@@ -214,7 +236,10 @@ export default function DynamicPostEditor({ fields, collectionId, token, initial
 
         fields.forEach(field => {
             if (field.type === 'Image') {
-                const url = formData[field.slug]
+                const value = formData[field.slug]
+                // Handle both string and object { url, alt }
+                const url = typeof value === 'object' && value?.url ? value.url : value
+
                 // Check if it's a Supabase URL (contains our bucket name)
                 if (url && typeof url === 'string' && url.includes('/post-images/')) {
                     // Extract path: everything after 'post-images/'
@@ -402,10 +427,25 @@ export default function DynamicPostEditor({ fields, collectionId, token, initial
                             )}
 
                             {field.type === 'Image' && (
-                                <ImageUploader
-                                    value={formData[field.slug]}
-                                    onChange={(url) => handleChange(field.slug, url)}
-                                />
+                                organizationId ? (
+                                    <ImageGenerator
+                                        value={formData[field.slug]}
+                                        onChange={(url) => handleChange(field.slug, url)}
+                                        organizationId={organizationId}
+                                        postContext={[
+                                            formData['name'] ? `Title: ${formData['name']}` : '',
+                                            formData['post-content'] ? `Content: ${formData['post-content']?.replace(/<[^>]*>?/gm, '')}` : '',
+                                            formData['post-excerpt'] ? `Excerpt: ${formData['post-excerpt']}` : '',
+                                            prompt ? `Instructions: ${prompt}` : '',
+                                            contextText ? `Notes: ${contextText}` : ''
+                                        ].filter(Boolean).join('\n\n')}
+                                    />
+                                ) : (
+                                    <ImageUploader
+                                        value={formData[field.slug]}
+                                        onChange={(url) => handleChange(field.slug, url)}
+                                    />
+                                )
                             )}
 
                             {field.type === 'Number' && (

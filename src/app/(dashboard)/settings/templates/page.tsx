@@ -6,6 +6,8 @@ import { Plus, Edit } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { redirect } from 'next/navigation'
 import { DeleteTemplateButton } from './delete-button'
+import { TemplateCardPreview } from './template-card-preview'
+import { DuplicateTemplateButton } from './duplicate-button'
 
 export default async function TemplatesPage() {
     const supabase = await createClient()
@@ -57,9 +59,7 @@ export default async function TemplatesPage() {
                         {templates.map((t: any) => (
                             <Card key={t.id} className="group rounded-none border-black hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all duration-200">
                                 <div className="aspect-[1.91/1] bg-gray-100 border-b border-black flex items-center justify-center overflow-hidden relative">
-                                    <div className="text-gray-400 text-sm font-mono">
-                                        {t.config?.layout || 'Template'}
-                                    </div>
+                                    <TemplateCardPreview config={t.config} />
                                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors" />
                                 </div>
                                 <div className="p-5">
@@ -75,6 +75,7 @@ export default async function TemplatesPage() {
                                                 <Edit className="mr-2 h-3 w-3" /> Edit
                                             </Button>
                                         </Link>
+                                        <DuplicateTemplateButton id={t.id} organizationId={member.organization_id} />
                                         <DeleteTemplateButton id={t.id} />
                                     </div>
                                 </div>

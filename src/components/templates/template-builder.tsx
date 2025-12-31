@@ -9,6 +9,7 @@ import { uploadImage } from '@/app/(dashboard)/settings/templates/upload-image'
 import { useDebounce } from 'use-debounce'
 
 import { Button } from '@/components/ui/button'
+import { Switch } from '@/components/ui/switch'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
@@ -659,6 +660,79 @@ export function TemplateBuilder({ organizationId, initialTemplate }: TemplateBui
                                                         </div>
                                                     </div>
                                                 )}
+
+                                                <div className="col-span-4 grid grid-cols-2 gap-2 mt-2">
+                                                    <div>
+                                                        <Label className="text-[10px]">Width</Label>
+                                                        <Input
+                                                            type="number"
+                                                            value={layer.width || 0}
+                                                            onChange={e => {
+                                                                const newLayers = [...(config.layers || [])];
+                                                                newLayers[index] = { ...newLayers[index], width: parseInt(e.target.value) || 0 };
+                                                                updateConfig('layers', newLayers);
+                                                            }}
+                                                            className="h-6 text-xs rounded-none border-black"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <Label className="text-[10px]">Height</Label>
+                                                        <Input
+                                                            type="number"
+                                                            value={layer.height || 0}
+                                                            onChange={e => {
+                                                                const newLayers = [...(config.layers || [])];
+                                                                newLayers[index] = { ...newLayers[index], height: parseInt(e.target.value) || 0 };
+                                                                updateConfig('layers', newLayers);
+                                                            }}
+                                                            className="h-6 text-xs rounded-none border-black"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <Label className="text-[10px]">Radius</Label>
+                                                        <Input
+                                                            type="number"
+                                                            value={layer.styles.borderRadius || 0}
+                                                            onChange={e => {
+                                                                const newLayers = [...(config.layers || [])];
+                                                                newLayers[index] = { ...newLayers[index], styles: { ...newLayers[index].styles, borderRadius: parseInt(e.target.value) || 0 } };
+                                                                updateConfig('layers', newLayers);
+                                                            }}
+                                                            className="h-6 text-xs rounded-none border-black"
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                <div className="col-span-4 mt-2 border-t border-black/10 pt-2">
+                                                    <div className="flex items-center space-x-2 mb-2">
+                                                        <Switch
+                                                            id={`uploadable-${layer.id}`}
+                                                            checked={!!layer.isUploadable}
+                                                            onCheckedChange={(checked) => {
+                                                                const newLayers = [...(config.layers || [])];
+                                                                newLayers[index] = { ...newLayers[index], isUploadable: checked };
+                                                                updateConfig('layers', newLayers);
+                                                            }}
+                                                        />
+                                                        <Label htmlFor={`uploadable-${layer.id}`} className="text-[10px] cursor-pointer">Allow User Upload (Interactive)</Label>
+                                                    </div>
+
+                                                    {layer.isUploadable && (
+                                                        <div className="ml-8">
+                                                            <Label className="text-[10px]">Placeholder Label</Label>
+                                                            <Input
+                                                                value={layer.placeholderText || ''}
+                                                                onChange={e => {
+                                                                    const newLayers = [...(config.layers || [])];
+                                                                    newLayers[index] = { ...newLayers[index], placeholderText: e.target.value };
+                                                                    updateConfig('layers', newLayers);
+                                                                }}
+                                                                className="h-6 text-xs rounded-none border-black"
+                                                                placeholder="Click to Upload"
+                                                            />
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </>
                                         )}
 

@@ -88,6 +88,7 @@ export default async function PostsPage() {
                     collectionId={config.collectionId}
                     token={token}
                     initialItems={initialItems}
+                    organizationId={member.organization_id}
                 />
             )}
         </div>

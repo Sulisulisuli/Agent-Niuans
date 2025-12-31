@@ -132,3 +132,43 @@ export async function deleteTemplate(id: string) {
     revalidatePath('/settings/templates')
     return { success: true }
 }
+
+export async function duplicateTemplate(id: string, organizationId: string) {
+    const supabase = await createClient()
+
+    // 1. Fetch original template
+    const { data: original, error: fetchError } = await supabase
+        .from('image_templates')
+        .select('*')
+        .eq('id', id)
+        .eq('organization_id', organizationId)
+        .single()
+
+    if (fetchError || !original) {
+        return { error: 'Template not found' }
+    }
+
+    // 2. Prepare new payload
+    const payload = {
+        name: `Copy of ${original.name}`,
+        config: original.config,
+        category: original.category,
+        organization_id: organizationId,
+        // created_at, updated_at, id are auto-generated
+    }
+
+    // 3. Insert new record
+    const { data: newTemplate, error: insertError } = await supabase
+        .from('image_templates')
+        .insert(payload)
+        .select()
+        .single()
+
+    if (insertError) {
+        console.error('duplicateTemplate Error:', insertError)
+        return { error: insertError.message }
+    }
+
+    revalidatePath('/settings/templates')
+    return { success: true, data: newTemplate }
+}
