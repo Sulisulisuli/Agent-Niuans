@@ -309,3 +309,55 @@ export async function disconnectLinkedIn() {
     revalidatePath('/settings')
     return { success: true }
 }
+
+export async function disconnectFacebook() {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Not authenticated')
+
+    const { data: member } = await supabase
+        .from('organization_members')
+        .select('organization_id')
+        .eq('user_id', user.id)
+        .single()
+
+    if (!member) throw new Error('No organization')
+
+    const { error } = await supabase
+        .from('organizations')
+        .update({
+            facebook_config: null
+        })
+        .eq('id', member.organization_id)
+
+    if (error) throw new Error('Failed to disconnect Facebook: ' + error.message)
+
+    revalidatePath('/settings')
+    return { success: true }
+}
+
+export async function disconnectInstagram() {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Not authenticated')
+
+    const { data: member } = await supabase
+        .from('organization_members')
+        .select('organization_id')
+        .eq('user_id', user.id)
+        .single()
+
+    if (!member) throw new Error('No organization')
+
+    const { error } = await supabase
+        .from('organizations')
+        .update({
+            instagram_config: null
+        })
+        .eq('id', member.organization_id)
+
+    if (error) throw new Error('Failed to disconnect Instagram: ' + error.message)
+
+    revalidatePath('/settings')
+    return { success: true }
+}
