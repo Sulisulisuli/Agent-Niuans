@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/utils/supabase/server'
+import { trackAsset } from '@/utils/asset-utils'
 
 export async function uploadImage(formData: FormData) {
     const supabase = await createClient()
@@ -26,10 +27,14 @@ export async function uploadImage(formData: FormData) {
         .from('template-assets')
         .upload(filePath, file)
 
+
     if (uploadError) {
         console.error('Upload Error:', uploadError)
         return { error: uploadError.message }
     }
+
+    // Track the asset
+    await trackAsset(filePath, 'template-assets')
 
     const { data: { publicUrl } } = supabase
         .storage

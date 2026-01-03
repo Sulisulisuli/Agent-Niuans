@@ -28,12 +28,12 @@ export default async function TemplatesPage() {
 
     return (
         <>
-            <header className="h-16 border-b border-gray-200 flex items-center px-8 flex-shrink-0 gap-8">
-                <h1 className="text-xl font-bold tracking-tight">Settings</h1>
-                <nav className="flex gap-4">
-                    <a href="/settings" className="text-sm font-medium text-gray-400 hover:text-black transition-colors pb-5 mt-5 border-b-2 border-transparent hover:border-gray-200">Integrations</a>
-                    <a href="/settings/organization" className="text-sm font-medium text-gray-400 hover:text-black transition-colors pb-5 mt-5 border-b-2 border-transparent hover:border-gray-200">Brand Identity</a>
-                    <a href="/settings/templates" className="text-sm font-medium border-b-2 border-black pb-5 mt-5">Templates</a>
+            <header className="h-16 border-b border-gray-200 flex items-center px-4 md:px-8 flex-shrink-0 gap-4 md:gap-8 overflow-hidden">
+                <h1 className="text-xl font-bold tracking-tight hidden md:block">Settings</h1>
+                <nav className="flex gap-4 overflow-x-auto scrollbar-hide w-full md:w-auto items-center h-full">
+                    <a href="/settings" className="text-sm font-medium text-gray-400 hover:text-black transition-colors pb-5 mt-5 border-b-2 border-transparent hover:border-gray-200 whitespace-nowrap">Integrations</a>
+                    <a href="/settings/organization" className="text-sm font-medium text-gray-400 hover:text-black transition-colors pb-5 mt-5 border-b-2 border-transparent hover:border-gray-200 whitespace-nowrap">Brand Identity</a>
+                    <a href="/settings/templates" className="text-sm font-medium border-b-2 border-black pb-5 mt-5 whitespace-nowrap">Templates</a>
                 </nav>
             </header>
 

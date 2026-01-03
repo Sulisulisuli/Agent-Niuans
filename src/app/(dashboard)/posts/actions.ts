@@ -3,6 +3,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { WebflowClient } from '@/lib/webflow'
 import { revalidatePath } from 'next/cache'
+import { confirmAsset } from '@/utils/asset-utils'
 
 export async function createWebflowPost(token: string, collectionId: string, formData: any) {
     try {
@@ -16,7 +17,11 @@ export async function createWebflowPost(token: string, collectionId: string, for
         const webflow = new WebflowClient(token)
         const result = await webflow.createItem(collectionId, formData)
 
+
         console.log('createWebflowPost: Success', result)
+
+        // Confirm assets
+        await checkAndConfirmAssets(formData)
 
         revalidatePath('/posts')
         return { success: true, itemId: result.id }
@@ -62,6 +67,9 @@ export async function updateWebflowPost(token: string, collectionId: string, ite
 
         console.log('updateWebflowPost: Success', result)
 
+        // Confirm assets
+        await checkAndConfirmAssets(formData)
+
         revalidatePath('/posts')
         return { success: true, itemId: result.id }
 
@@ -93,5 +101,24 @@ export async function deleteWebflowItem(token: string, collectionId: string, ite
         return { success: true }
     } catch (e: any) {
         return { error: e.message }
+    }
+}
+
+async function checkAndConfirmAssets(formData: any) {
+    try {
+        // Iterate through all values in formData
+        for (const key in formData) {
+            const value = formData[key]
+            if (typeof value === 'string' && value.includes('/post-images/')) {
+                // Found a post image URL
+                const parts = value.split('/post-images/')
+                if (parts.length > 1) {
+                    const path = parts[1] // e.g. "filename.png" or "user/filename.png"
+                    await confirmAsset(decodeURIComponent(path), 'post-images')
+                }
+            }
+        }
+    } catch (e) {
+        console.error('checkAndConfirmAssets Error:', e)
     }
 }

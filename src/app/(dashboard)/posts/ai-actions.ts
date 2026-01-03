@@ -291,6 +291,7 @@ export async function generateTemplateContent(context: string, organizationId: s
 }
 
 import { createClient } from '@/utils/supabase/server'
+import { trackAsset } from '@/utils/asset-utils'
 
 export async function generateImage(prompt: string) {
     if (!process.env.GEMINI_API_KEY) return { error: 'Gemini API Key missing' }
@@ -320,7 +321,12 @@ export async function generateImage(prompt: string) {
 
         // Upload to Supabase
         const supabase = await createClient()
-        const fileName = `ai-gen-${Date.now()}.${ext}`
+
+        // Authenticate user to get ID for folder structure
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) throw new Error("User not found for image upload")
+
+        const fileName = `${user.id}/ai-gen-${Date.now()}.${ext}`
         const buffer = Buffer.from(base64Image, 'base64')
 
         const { error: uploadError } = await supabase.storage
@@ -330,6 +336,9 @@ export async function generateImage(prompt: string) {
             })
 
         if (uploadError) throw uploadError
+
+        // Track the asset
+        await trackAsset(fileName, 'post-images')
 
         const { data: publicUrlData } = supabase.storage
             .from('post-images')

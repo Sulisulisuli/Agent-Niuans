@@ -43,7 +43,7 @@ export function AppSidebar({ user, profile }: AppSidebarProps) {
         : user?.email?.substring(0, 2).toUpperCase() || 'AN'
 
     return (
-        <div className="flex flex-col h-full w-64 bg-black text-white border-r border-black/10">
+        <div className="flex flex-col h-full w-full bg-black text-white border-r border-black/10">
             <div className="p-6">
                 <div className="flex items-center gap-2">
                     <div className="h-6 w-6 bg-[#eb4f27]"></div>
@@ -101,7 +101,7 @@ export function AppSidebar({ user, profile }: AppSidebarProps) {
                                 </div>
                             </button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-56 rounded-none border-black bg-black text-white" align="start" side="right" forceMount>
+                        <DropdownMenuContent className="w-56 rounded-none border-black bg-black text-white" align="start" side="top" forceMount>
                             <DropdownMenuLabel className="font-normal">
                                 <div className="flex flex-col space-y-1">
                                     <p className="text-sm font-medium leading-none">{profile?.full_name}</p>

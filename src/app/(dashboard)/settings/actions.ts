@@ -202,9 +202,22 @@ export async function saveOrganizationProfile(profile: any) {
 
     if (!member) return { error: 'No organization found' }
 
+    // Fetch existing profile first
+    const { data: org, error: fetchError } = await supabase
+        .from('organizations')
+        .select('brand_profile')
+        .eq('id', member.organization_id)
+        .single()
+
+    if (fetchError) return { error: 'Failed to fetch existing profile' }
+
+    const currentProfile = org?.brand_profile || {}
+    // Merge existing profile (which contains domain) with new profile data
+    const updatedProfile = { ...currentProfile, ...profile }
+
     const { error } = await supabase
         .from('organizations')
-        .update({ brand_profile: profile })
+        .update({ brand_profile: updatedProfile })
         .eq('id', member.organization_id)
 
     if (error) return { error: error.message }

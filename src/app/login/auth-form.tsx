@@ -6,8 +6,8 @@ import { useSearchParams } from 'next/navigation'
 import { login, signup } from '../auth/actions'
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Button } from "@/components/ui/button"
 import { cn } from '@/lib/utils'
+import { SubmitButton } from './submit-button'
 
 export default function AuthForm() {
     const [isLogin, setIsLogin] = useState(true)
@@ -110,9 +110,9 @@ export default function AuthForm() {
                                         className="h-12 border-black focus-visible:ring-black focus-visible:ring-offset-0 rounded-none bg-transparent"
                                     />
                                 </div>
-                                <Button type="submit" className="w-full h-12 bg-[#eb4f27] hover:bg-black hover:text-white text-white font-medium rounded-none transition-colors duration-200 mt-2">
+                                <SubmitButton className="w-full h-12 bg-[#eb4f27] hover:bg-black hover:text-white text-white font-medium rounded-none transition-colors duration-200 mt-2">
                                     Log in
-                                </Button>
+                                </SubmitButton>
                             </form>
                         </motion.div>
                     ) : (
@@ -166,9 +166,9 @@ export default function AuthForm() {
                                         className="h-12 border-black focus-visible:ring-black focus-visible:ring-offset-0 rounded-none bg-transparent"
                                     />
                                 </div>
-                                <Button type="submit" className="w-full h-12 bg-black hover:bg-[#eb4f27] hover:text-white text-white font-medium rounded-none transition-colors duration-200 mt-2">
+                                <SubmitButton className="w-full h-12 bg-black hover:bg-[#eb4f27] hover:text-white text-white font-medium rounded-none transition-colors duration-200 mt-2">
                                     Create account
-                                </Button>
+                                </SubmitButton>
                             </form>
                         </motion.div>
                     )}
