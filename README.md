@@ -27,6 +27,12 @@ Agent Niuans is a powerful, AI-driven Marketing Automation Platform designed to 
 - **SVG Support**: Paste raw SVG code directly for custom graphics and logos.
 - **Template Management**: Create, save, and manage multiple reusable branded templates.
 
+### 📈 Analytics Dashboard
+- **Bento Grid Layout**: Modern, consolidated view of all your key metrics.
+- **Google Integration**: Seamlessly connect GA4 and Search Console for real-time traffic and search data.
+- **Performance Tracking**: Built-in PageSpeed Insights visualization for Core Web Vitals.
+- **AI Reports**: Generate one-click AI summaries of your analytics to understand trends and opportunities.
+
 ## 🛠 Tech Stack
 
 - **Frontend**: Next.js 15, React, Tailwind CSS v4, Shadcn UI.
@@ -74,6 +80,11 @@ Agent Niuans is a powerful, AI-driven Marketing Automation Platform designed to 
 
     # Webflow
     # (Tokens are usually managed per user in the DB, but system-wide tokens can go here if needed)
+
+    # Google Integration
+    GOOGLE_CLIENT_ID=your_google_client_id
+    GOOGLE_CLIENT_SECRET=your_google_client_secret
+    NEXT_PUBLIC_APP_URL=http://localhost:3000
     ```
 
 4.  **Run the development server:**

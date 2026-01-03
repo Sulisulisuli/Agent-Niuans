@@ -72,6 +72,16 @@
     - Engine resolves variables against content data at runtime.
 - **Features**: Auto-fit text (heuristic-based), generic rotation, raw SVG rendering, and Z-index management.
 
+### 5. Google Integration & Analytics
+- **OAuth2 Flow**: Secure connection to Google via `googleapis` Auth. Handles token lifecycle and permission scopes.
+- **Bento Grid Dashboard**:
+    - **Visuals**: Modern, responsive grid layout using `recharts` for data visualization.
+    - **Metrics**: Real-time fetching of GA4 (Active Users, New Users, Engagement Rate) and Search Console (Clicks, Impressions).
+    - **PageSpeed**: Integration with PSI API for performance, SEO, and accessibility scores.
+- **AI Reporting**:
+    - **Intelligent Analysis**: Feeds fetched analytics data into Gemini to generate actionable insights and summary reports.
+    - **Tooling**: Built with Shadcn UI Cards, Tabs, and custom Tooltips (`@radix-ui/react-tooltip`) for enhanced UX.
+
 ## Database Schema Highlights
 - `profiles`: Linked to Supabase Auth, stores `linkedin_access_token`, `linkedin_urn`.
 - `organizations`: Tenant management.
