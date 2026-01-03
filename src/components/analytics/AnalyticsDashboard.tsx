@@ -243,7 +243,7 @@ export default function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
                                                                 }`}
                                                         />
                                                     </svg>
-                                                    <span className="absolute text-2xl font-bold">{score}</span>
+                                                    <span className="absolute text-2xl font-bold">{score as number}</span>
                                                 </div>
                                             </div>
                                         </CardContent>
