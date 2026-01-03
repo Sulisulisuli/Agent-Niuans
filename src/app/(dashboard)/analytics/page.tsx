@@ -33,8 +33,8 @@ export default async function AnalyticsPage() {
     const googleConfig = (org?.google_config as any) || {};
     const isConnected = !!(googleConfig.accessToken);
 
-    let traffic = [];
-    let search = [];
+    let traffic: any[] = [];
+    let search: any[] = [];
 
     let pageSpeed = null;
 
