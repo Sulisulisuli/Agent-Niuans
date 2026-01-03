@@ -5,7 +5,7 @@ import { signout } from '@/app/auth/actions'
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { LayoutDashboard, Database, Share2, Settings, User, LogOut, Linkedin, Facebook, Instagram } from "lucide-react"
+import { LayoutDashboard, Database, Share2, Settings, User, LogOut, Linkedin, Facebook, Instagram, BarChart3 } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
     DropdownMenu,
@@ -27,6 +27,7 @@ export function AppSidebar({ user, profile }: AppSidebarProps) {
     const navItems = [
         { name: "Dashboard", href: "/", icon: LayoutDashboard },
         { name: "Website CMS", href: "/posts", icon: Database },
+        { name: "Analytics", href: "/analytics", icon: BarChart3 },
         { name: "LinkedIn", href: "/linkedin", icon: Linkedin },
         { name: "Facebook", href: "/facebook", icon: Facebook },
         { name: "Instagram", href: "/instagram", icon: Instagram },
