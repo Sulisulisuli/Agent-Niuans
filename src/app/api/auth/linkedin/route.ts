@@ -23,7 +23,7 @@ export async function GET(request: Request) {
 
     // NOTE: w_organization_social requires "Marketing Developer Platform" product in LinkedIn Portal
     // Adding it without approval causes a "Bummer, something went wrong" error on LinkedIn.
-    const scope = encodeURIComponent('w_member_social openid profile email')
+    const scope = encodeURIComponent('w_member_social w_organization_social r_organization_social rw_organization_admin openid profile email')
 
     if (!clientId) {
         return Response.json({ error: 'LinkedIn Client ID not configured' }, { status: 500 })

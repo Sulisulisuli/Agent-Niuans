@@ -33,50 +33,50 @@ export async function shareOnLinkedIn(
 
         if (authorType === 'organization') {
             if (!organizationId) return { success: false, error: 'Organization ID not configured' }
-            // Clean the organization ID to ensure it's just the number
+            // Ensure inputs like "urn:li:organization:123" or just "123" both work
             const cleanOrgId = organizationId.replace('urn:li:organization:', '')
             authorUrn = `urn:li:organization:${cleanOrgId}`
         }
 
-        const body = {
+        // POSTS API BODY
+        // Docs: https://learn.microsoft.com/en-us/linkedin/marketing/community-management/shares/posts-api
+        const body: any = {
             author: authorUrn,
-            lifecycleState: "PUBLISHED",
-            specificContent: {
-                "com.linkedin.ugc.ShareContent": {
-                    shareCommentary: {
-                        text: content
-                    },
-                    shareMediaCategory: articleUrl ? "ARTICLE" : "NONE",
-                    media: articleUrl ? [
-                        {
-                            status: "READY",
-                            description: {
-                                text: "Read more"
-                            },
-                            originalUrl: articleUrl,
-                            title: {
-                                text: title || "New Post"
-                            },
-                            thumbnails: thumbnailUrl ? [{ url: thumbnailUrl }] : undefined
-                        }
-                    ] : undefined
-                }
+            commentary: content,
+            visibility: visibility === 'PUBLIC' ? "PUBLIC" : "CONNECTIONS",
+            distribution: {
+                feedDistribution: "MAIN_FEED",
+                targetEntities: [],
+                thirdPartyDistributionChannels: []
             },
-            visibility: {
-                "com.linkedin.ugc.MemberNetworkVisibility": visibility
+            lifecycleState: "PUBLISHED",
+            isReshareDisabledByAuthor: false
+        }
+
+        // Handle Media (Article/Link)
+        if (articleUrl) {
+            body.content = {
+                article: {
+                    source: articleUrl,
+                    title: title || "New Post",
+                    // description: "...", // Optional
+                    thumbnail: thumbnailUrl ? { url: thumbnailUrl } : undefined
+                }
             }
         }
 
+        // TODO: Handle Image uploads via "media" field if needed later. 
+        // For now, simple text or link/article share.
 
-        console.log("LinkedIn Request Body:", JSON.stringify(body, null, 2))
+        console.log("LinkedIn Request Body (Posts API):", JSON.stringify(body, null, 2))
 
-        // 5. Send Request
-        const response = await fetch('https://api.linkedin.com/v2/ugcPosts', {
+        const response = await fetch('https://api.linkedin.com/rest/posts', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${config.accessToken}`,
                 'Content-Type': 'application/json',
-                'X-Restli-Protocol-Version': '2.0.0'
+                'X-Restli-Protocol-Version': '2.0.0',
+                'LinkedIn-Version': '202401', // Using a recent version
             },
             body: JSON.stringify(body)
         })
@@ -84,11 +84,19 @@ export async function shareOnLinkedIn(
         if (!response.ok) {
             const errorText = await response.text()
             console.error('LinkedIn API Error:', errorText)
-            return { success: false, error: `LinkedIn API Error: ${response.statusText}` }
+            return { success: false, error: `LinkedIn API Error: ${response.statusText} - ${errorText}` }
         }
 
-        const data = await response.json()
-        return { success: true, postId: data.id }
+        // Success - Posts API returns 201 Created and the ID in the 'x-restli-id' header or body
+        // But simply checking 201/200 OK is enough for success flag.
+        // The body might contain the ID or full object.
+        const data = await response.json().catch(() => ({})) // Body might be empty on 201
+
+        // The ID usually comes in the header 'x-linkedin-id' or 'x-restli-id' but fetch in server actions might abstract headers.
+        // Let's try to get ID from body if available, or fall back to a generic success.
+        const newPostId = data.id || response.headers.get('x-restli-id')
+
+        return { success: true, postId: newPostId }
 
     } catch (error: any) {
         console.error('shareOnLinkedIn Exception:', error)
